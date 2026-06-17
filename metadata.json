@@ -1,0 +1,6 @@
+{
+  "name": "Telegram Bot Scheduler",
+  "description": "An automated Telegram bot to schedule messages to multiple groups.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

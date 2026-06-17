@@ -1,0 +1,122 @@
+{
+  "bots": [
+    {
+      "id": "bot_1781696697518",
+      "name": "PaymentNotice",
+      "token": "8750681716:AAEZsfZqIfgkNHVGSbrSCg7F4x8fv11r6tw",
+      "status": "active",
+      "createdAt": "2026-06-17T11:44:57.518Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "grp_1781696704174",
+      "name": "TEST",
+      "chatId": "-1004388193448",
+      "botId": "bot_1781696697518",
+      "memberCount": 1500
+    },
+    {
+      "id": "grp_1781696724830",
+      "name": "TEST2",
+      "chatId": "-1004349404572",
+      "botId": "bot_1781696697518",
+      "memberCount": 1500
+    }
+  ],
+  "schedules": [
+    {
+      "id": "sched_payment_notice_01",
+      "name": "Udvash 1st Slot (Monthly - 14th @ 10:00 AM)",
+      "botId": "bot_1781696697518",
+      "groupId": "grp_1781696704174",
+      "groupIds": [
+        "grp_1781696704174",
+        "grp_1781696724830"
+      ],
+      "messageTemplate": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি {payment_deadline_bangla} তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
+      "recurrence": "monthly",
+      "dayOfMonth": 17,
+      "time": "17:59",
+      "status": "active",
+      "dayOfWeek": 1,
+      "lastSent": "2026-06-17T11:59:15.716Z"
+    },
+    {
+      "id": "sched_payment_notice_02",
+      "name": "Udvash 2nd Slot (Monthly - 28th @ 10:00 AM)",
+      "botId": "bot_1781696697518",
+      "groupId": "grp_1781696724830",
+      "groupIds": [
+        "grp_1781696724830",
+        "grp_1781696704174"
+      ],
+      "messageTemplate": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি {payment_deadline_bangla} তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
+      "recurrence": "monthly",
+      "dayOfMonth": 28,
+      "time": "10:00",
+      "status": "active",
+      "dayOfWeek": 1
+    }
+  ],
+  "logs": [
+    {
+      "id": "log_srv_17816975564870ak9",
+      "timestamp": "6/17/2026, 5:59:15 PM",
+      "type": "success",
+      "botName": "PaymentNotice",
+      "groupName": "TEST2",
+      "message": "Successfully transmitted directly to Telegram server natively from background!",
+      "actualContent": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি ১৬/০৬/২৬ তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
+      "isRealDelivery": true,
+      "deliveryStatus": "success"
+    },
+    {
+      "id": "log_srv_1781697555718xqiz",
+      "timestamp": "6/17/2026, 5:59:15 PM",
+      "type": "success",
+      "botName": "PaymentNotice",
+      "groupName": "TEST",
+      "message": "Successfully transmitted directly to Telegram server natively from background!",
+      "actualContent": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি ১৬/০৬/২৬ তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
+      "isRealDelivery": true,
+      "deliveryStatus": "success"
+    },
+    {
+      "id": "log_srv_1781697437121k51h",
+      "timestamp": "6/17/2026, 5:57:15 PM",
+      "type": "success",
+      "botName": "PaymentNotice",
+      "groupName": "TEST2",
+      "message": "Successfully transmitted directly to Telegram server natively from background!",
+      "actualContent": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি ১৬/০৬/২৬ তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
+      "isRealDelivery": true,
+      "deliveryStatus": "success"
+    },
+    {
+      "id": "log_srv_1781697435786g9j9",
+      "timestamp": "6/17/2026, 5:57:15 PM",
+      "type": "success",
+      "botName": "PaymentNotice",
+      "groupName": "TEST",
+      "message": "Successfully transmitted directly to Telegram server natively from background!",
+      "actualContent": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি ১৬/০৬/২৬ তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট জুন ২০২৬ এর ১ম স্লটে মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
+      "isRealDelivery": true,
+      "deliveryStatus": "success"
+    },
+    {
+      "id": "log_1781696711622_v141",
+      "timestamp": "6/17/2026, 5:45:06 PM",
+      "type": "success",
+      "botName": "PaymentNotice",
+      "groupName": "TEST",
+      "message": "Manual test message delivered directly to Telegram group 'TEST'! [Deleted from Telegram]",
+      "actualContent": "This message has been deleted.",
+      "isRealDelivery": true,
+      "deliveryStatus": "success",
+      "telegramChatId": "-1004388193448",
+      "telegramBotToken": "8750681716:AAEZsfZqIfgkNHVGSbrSCg7F4x8fv11r6tw"
+    }
+  ],
+  "isRealDeliveryEnabled": true
+}
