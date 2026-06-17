@@ -1,6 +1,6 @@
 {
-  "name": "BotControl Panel",
-  "description": "Professional automated Telegram bot management system for group broadcasts and Udvash payment notices.",
+  "name": "BotControl v3.0 Pro",
+  "description": "Professional Telegram Bot Automation with Remote Render Sync & Bangladesh Localized Scheduling.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

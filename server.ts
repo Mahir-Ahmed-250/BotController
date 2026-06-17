@@ -383,7 +383,7 @@ async function startServer() {
   });
 
   // API 2: Update state on client user transformations
-  app.post("/api/data", (req, res) => {
+  app.post("/api/data", async (req, res) => {
     const { bots, groups, schedules, logs, isRealDeliveryEnabled } = req.body;
     const existing = readSystemData();
 
@@ -396,6 +396,19 @@ async function startServer() {
     };
 
     writeSystemData(merged);
+
+    // Push to Render if remote URL is set
+    const remoteUrl = process.env.REMOTE_RENDER_URL;
+    if (remoteUrl && process.env.ENABLE_REMOTE_PUSH === "true") {
+      try {
+        console.log(`[SYNC] Pushing to remote ${remoteUrl}...`);
+        await axios.post(`${remoteUrl}/api/data`, merged, { timeout: 8000 });
+        console.log("[SYNC] Push successful.");
+      } catch (err: any) {
+        console.error(`[SYNC] Push failed: ${err.message}`);
+      }
+    }
+
     res.json({ ok: true, message: "Storage synced." });
   });
 

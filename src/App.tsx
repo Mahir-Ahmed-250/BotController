@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { 
   LayoutDashboard, 
   Bot, 
@@ -34,7 +35,8 @@ import {
   Key,
   ShieldCheck,
   Copy,
-  CalendarDays
+  CalendarDays,
+  Cloud
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TelegramBot, TelegramGroup, MessageSchedule, MessageTemplate, SimulationLog, ScheduleRecurrence, UserAccount, UserSession } from './types';
@@ -1765,6 +1767,34 @@ export default function App() {
                         </div>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="bg-white border border-slate-200 rounded p-6 shadow-sm space-y-4">
+                    <div className="flex items-center gap-2 text-slate-800">
+                      <Cloud size={18} className="text-indigo-600" />
+                      <h4 className="font-bold text-sm uppercase tracking-wide">Sync Management</h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Push your local schedules, bots, and group configurations to the Render production server manually.
+                    </p>
+                    <button 
+                      onClick={async () => {
+                        try {
+                          const res = await axios.post('/api/data', {
+                            bots, groups, schedules, templates, logs, isRealDeliveryEnabled
+                          });
+                          if (res.data.ok) {
+                            triggerToast('Production data synced successfully!', 'success');
+                          }
+                        } catch (e) {
+                          triggerToast('Sync failed. Check console for details.', 'error');
+                        }
+                      }}
+                      className="w-full py-2.5 bg-indigo-600 text-white rounded text-xs font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                    >
+                      <RefreshCcw size={14} />
+                      Sync to Render Production
+                    </button>
                   </div>
                 </div>
 
