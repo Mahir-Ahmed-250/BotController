@@ -142,12 +142,22 @@ function writeSystemData(data: any) {
   }
 }
 
-// Helper: Get exact Bangladesh Standard Time (UTC+6)
-function getCurrentBangladeshTime(): Date {
-  const utcDate = new Date();
-  const utcTime = utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000);
-  const bdTime = new Date(utcTime + (3600000 * 6));
-  return bdTime;
+// Helper: Get Bangladesh time components without shifting the Date object
+function getBangladeshNow() {
+  const now = new Date();
+  // Bangladesh is always UTC+6
+  const bdTime = new Date(now.getTime() + (6 * 3600000));
+  
+  return {
+    hours: String(bdTime.getUTCHours()).padStart(2, '0'),
+    minutes: String(bdTime.getUTCMinutes()).padStart(2, '0'),
+    dayOfMonth: bdTime.getUTCDate(),
+    dayOfWeek: bdTime.getUTCDay(),
+    month: bdTime.getUTCMonth(),
+    year: bdTime.getUTCFullYear(),
+    fullDate: bdTime, // This is still shifted, use with caution
+    realDate: now // Use this for actual timestamps (logs, lastSent)
+  };
 }
 
 // Helper: Message Encoder
@@ -232,13 +242,11 @@ function formatTelegramMessage(
 
 // Background scheduler checker
 async function runBackgroundSchedulerTicks() {
-  const bdNow = getCurrentBangladeshTime();
-  const hours = String(bdNow.getHours()).padStart(2, '0');
-  const minutes = String(bdNow.getMinutes()).padStart(2, '0');
-  const currentTimeStr = `${hours}:${minutes}`;
+  const bdNow = getBangladeshNow();
+  const currentTimeStr = `${bdNow.hours}:${bdNow.minutes}`;
 
-  const currentDayOfMonth = bdNow.getDate();
-  const currentDayOfWeek = bdNow.getDay(); // 0 is Sunday
+  const currentDayOfMonth = bdNow.dayOfMonth;
+  const currentDayOfWeek = bdNow.dayOfWeek;
 
   const systemData = readSystemData();
   const { schedules, bots, groups, logs, isRealDeliveryEnabled } = systemData;
@@ -250,8 +258,9 @@ async function runBackgroundSchedulerTicks() {
     // Check if scheduled time matches Bangladesh local time string "HH:MM"
     if (schedule.time === currentTimeStr) {
       // Avoid duplicate triggerings in the same minute
+      // Use real UTC for comparison to avoid timezone shifting issues in lastSent
       const lastSentTime = schedule.lastSent ? new Date(schedule.lastSent) : null;
-      const isRecentlySent = lastSentTime && (Math.abs(bdNow.getTime() - lastSentTime.getTime()) < 90000); // 90 seconds gap
+      const isRecentlySent = lastSentTime && (Math.abs(bdNow.realDate.getTime() - lastSentTime.getTime()) < 90000); 
 
       if (isRecentlySent) continue;
 
@@ -263,8 +272,18 @@ async function runBackgroundSchedulerTicks() {
       } else if (schedule.recurrence === "monthly" && schedule.dayOfMonth === currentDayOfMonth) {
         isMatch = true;
       } else if (schedule.recurrence === "once") {
-        isMatch = true;
-        schedule.status = "paused"; // Set once to paused after trigger
+        // For 'once', we should check if the day matches too if specified
+        // or just trigger at the next occurrence if not specified.
+        // User reports setting for June 18th, so we should respect dayOfMonth if present.
+        if (schedule.dayOfMonth) {
+          if (schedule.dayOfMonth === currentDayOfMonth) {
+            isMatch = true;
+            schedule.status = "paused";
+          }
+        } else {
+          isMatch = true;
+          schedule.status = "paused";
+        }
       }
 
       if (isMatch) {
@@ -286,12 +305,12 @@ async function runBackgroundSchedulerTicks() {
 
         // Process message delivery for each group in the target set
         for (const group of targetGroups) {
-          const content = formatTelegramMessage(schedule.messageTemplate, bot.name, group.name, group.memberCount, bdNow);
+          const content = formatTelegramMessage(schedule.messageTemplate, bot.name, group.name, group.memberCount, bdNow.fullDate);
           const newLogId = 'log_srv_' + Date.now() + Math.random().toString(36).substr(2, 4);
 
           const newLog: SimulationLog = {
             id: newLogId,
-            timestamp: bdNow.toLocaleString('en-US'),
+            timestamp: bdNow.realDate.toISOString(), // Save proper UTC ISO string
             type: "info",
             botName: bot.name,
             groupName: group.name,
@@ -338,7 +357,7 @@ async function runBackgroundSchedulerTicks() {
           logs.unshift(newLog);
         }
 
-        schedule.lastSent = bdNow.toISOString();
+        schedule.lastSent = bdNow.realDate.toISOString(); // Save proper UTC ISO string
         hasModified = true;
       }
     }

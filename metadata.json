@@ -1,6 +1,6 @@
 {
-  "name": "Telegram Bot Scheduler",
-  "description": "An automated Telegram bot to schedule messages to multiple groups.",
+  "name": "BotControl Panel",
+  "description": "Professional automated Telegram bot management system for group broadcasts and Udvash payment notices.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

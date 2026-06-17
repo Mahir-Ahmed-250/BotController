@@ -210,8 +210,12 @@ export default function App() {
   // Navigation
   const [activeTab, setActiveTab] = useState<'dashboard' | 'bots' | 'groups' | 'schedules' | 'templates' | 'logs' | 'calendar'>('dashboard');
 
-  // Core States
+  // Persistence Helpers
   const [isInitialDataLoaded, setIsInitialDataLoaded] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Core States
   const [bots, setBots] = useState<TelegramBot[]>(() => {
     const saved = localStorage.getItem('bt_bots');
     return saved ? JSON.parse(saved) : INITIAL_BOTS;
@@ -372,6 +376,9 @@ export default function App() {
   useEffect(() => {
     let active = true;
     const fetchAndMergeUpdates = async () => {
+      // Don't poll while the initial load is pending or if a local sync was just initiated
+      if (!isInitialDataLoaded || isSyncing) return;
+
       try {
         const response = await fetch("/api/data");
         const data = await response.json();
@@ -381,35 +388,43 @@ export default function App() {
         const isEditing = showBotModal || showGroupModal || showScheduleModal || showTemplateModal;
         if (isEditing) return;
 
+        // Check for bots change
         if (data.bots && Array.isArray(data.bots)) {
           setBots(prev => {
             if (JSON.stringify(prev) !== JSON.stringify(data.bots)) {
+              console.log("Syncing bots from server...");
               return data.bots;
             }
             return prev;
           });
         }
+        // Check for groups change
         if (data.groups && Array.isArray(data.groups)) {
           setGroups(prev => {
             if (JSON.stringify(prev) !== JSON.stringify(data.groups)) {
+              console.log("Syncing groups from server...");
               return data.groups;
             }
             return prev;
           });
         }
+        // Check for schedules change
         if (data.schedules && Array.isArray(data.schedules)) {
           setSchedules(prev => {
             if (JSON.stringify(prev) !== JSON.stringify(data.schedules)) {
+              console.log("Syncing schedules from server...");
               return data.schedules;
             }
             return prev;
           });
         }
+        // Check for logs change
         if (data.logs && Array.isArray(data.logs)) {
           setLogs(prev => {
             const currentFirstId = prev[0]?.id;
             const incomingFirstId = data.logs[0]?.id;
             if (prev.length !== data.logs.length || currentFirstId !== incomingFirstId) {
+              console.log("Syncing logs from server...");
               return data.logs;
             }
             return prev;
@@ -430,13 +445,17 @@ export default function App() {
       active = false;
       clearInterval(pollTimer);
     };
-  }, [showBotModal, showGroupModal, showScheduleModal, showTemplateModal]);
+  }, [showBotModal, showGroupModal, showScheduleModal, showTemplateModal, isInitialDataLoaded, isSyncing]);
 
   // Sync to database and local fallback persistent states whenever inputs change
   useEffect(() => {
     if (!isInitialDataLoaded) return;
 
-    const syncDatabaseState = async () => {
+    // Debounce the sync to avoid high frequency POSTs
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+
+    syncTimeoutRef.current = setTimeout(async () => {
+      setIsSyncing(true);
       try {
         await fetch("/api/data", {
           method: "POST",
@@ -451,8 +470,11 @@ export default function App() {
         });
       } catch (error) {
         console.warn("Continuous sync with server failed:", error);
+      } finally {
+        // Leave a small window before allowing polling again to let the server process
+        setTimeout(() => setIsSyncing(false), 2000);
       }
-    };
+    }, 1000);
 
     localStorage.setItem('bt_bots', JSON.stringify(bots));
     localStorage.setItem('bt_groups', JSON.stringify(groups));
@@ -461,9 +483,10 @@ export default function App() {
     localStorage.setItem('bt_logs', JSON.stringify(logs));
     localStorage.setItem('bt_real_delivery', String(isRealDeliveryEnabled));
 
-    const timeout = setTimeout(syncDatabaseState, 600);
-    return () => clearTimeout(timeout);
-  }, [bots, groups, schedules, templates, logs, isRealDeliveryEnabled]);
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    };
+  }, [bots, groups, schedules, templates, logs, isRealDeliveryEnabled, isInitialDataLoaded]);
 
   // Safeguard: Inject Udvash Board Payment Notice template and schedules if not already present
   useEffect(() => {
@@ -1658,7 +1681,7 @@ export default function App() {
                                       {schedule.recurrence === 'monthly' && `Every month on day ${schedule.dayOfMonth}`}
                                       {schedule.recurrence === 'weekly' && `Weekly on ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][schedule.dayOfWeek || 0]}`}
                                       {schedule.recurrence === 'daily' && 'Daily auto-transmit'}
-                                      {schedule.recurrence === 'once' && 'One-time message'}
+                                      {schedule.recurrence === 'once' && `One-time on day ${schedule.dayOfMonth || '?'}`}
                                     </div>
                                   </td>
                                   <td className="p-4 text-center">
@@ -2090,7 +2113,7 @@ export default function App() {
                               {schedule.recurrence === 'monthly' && `Day ${schedule.dayOfMonth} @ ${formatTimeTo12Hour(schedule.time)}`}
                               {schedule.recurrence === 'weekly' && `Every ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][schedule.dayOfWeek || 0]} @ ${formatTimeTo12Hour(schedule.time)}`}
                               {schedule.recurrence === 'daily' && `Daily @ ${formatTimeTo12Hour(schedule.time)}`}
-                              {schedule.recurrence === 'once' && `Once @ ${formatTimeTo12Hour(schedule.time)}`}
+                              {schedule.recurrence === 'once' && `Day ${schedule.dayOfMonth} (Once) @ ${formatTimeTo12Hour(schedule.time)}`}
                             </div>
 
                             <div className="flex gap-2">
@@ -2682,9 +2705,11 @@ export default function App() {
                   </select>
                 </div>
 
-                {scheduleForm.recurrence === 'monthly' && (
+                {(scheduleForm.recurrence === 'monthly' || scheduleForm.recurrence === 'once') && (
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1">Day of Month *</label>
+                    <label className="text-[11px] font-bold text-slate-700 uppercase tracking-wide block mb-1">
+                      {scheduleForm.recurrence === 'once' ? 'Target Day' : 'Day of Month'} *
+                    </label>
                     <select 
                       id="schedule-dayofmonth-select"
                       value={scheduleForm.dayOfMonth}
