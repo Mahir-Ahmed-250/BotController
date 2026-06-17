@@ -466,6 +466,7 @@ export default function App() {
             bots,
             groups,
             schedules,
+            templates,
             logs,
             isRealDeliveryEnabled
           })
@@ -1205,6 +1206,24 @@ export default function App() {
   };
 
   // Helper variables statistics
+  // Helper: Format to Bangladesh Standard Time (UTC+6)
+  const formatToBDTime = (dateInput?: Date | string | null) => {
+    if (!dateInput) return 'Never';
+    const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    try {
+      return d.toLocaleString('en-US', { 
+        timeZone: 'Asia/Dhaka', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true,
+        day: 'numeric',
+        month: 'short'
+      });
+    } catch (e) {
+      return d.toLocaleString();
+    }
+  };
+
   const activeBotsCount = bots.filter(b => b.status === 'active').length;
   const connectedGroupsCount = groups.length;
   const activeSchedulesCount = schedules.filter(s => s.status === 'active').length;
@@ -1503,7 +1522,15 @@ export default function App() {
           </div>
           
           <div className="flex items-center gap-4">
-
+            
+            {/* Bangladesh Server Clock */}
+            <div className="hidden md:flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-3 py-1.5 rounded-lg shadow-sm">
+              <Clock size={14} className="text-indigo-600 animate-pulse" />
+              <div className="text-left">
+                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-tighter block leading-none">BD Time (GMT+6)</span>
+                <span className="text-xs font-bold text-indigo-700 font-mono">{formatToBDTime(simulatedTime)}</span>
+              </div>
+            </div>
 
             {/* Active User Session Avatar / Info */}
             <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-1.5 pr-3 pl-3 shadow-2xs">
@@ -1683,7 +1710,7 @@ export default function App() {
                                       {schedule.recurrence === 'monthly' && `Every month on day ${schedule.dayOfMonth}`}
                                       {schedule.recurrence === 'weekly' && `Weekly on ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][schedule.dayOfWeek || 0]}`}
                                       {schedule.recurrence === 'daily' && 'Daily auto-transmit'}
-                                      {schedule.recurrence === 'once' && `One-time on day ${schedule.dayOfMonth || '?'}`}
+                                      {schedule.recurrence === 'once' && `Once: Month Day ${schedule.dayOfMonth || '?'}`}
                                     </div>
                                   </td>
                                   <td className="p-4 text-center">
@@ -1777,24 +1804,54 @@ export default function App() {
                     <p className="text-xs text-slate-500 leading-relaxed">
                       Push your local schedules, bots, and group configurations to the Render production server manually.
                     </p>
-                    <button 
-                      onClick={async () => {
-                        try {
-                          const res = await axios.post('/api/data', {
-                            bots, groups, schedules, templates, logs, isRealDeliveryEnabled
-                          });
-                          if (res.data.ok) {
-                            triggerToast('Production data synced successfully!', 'success');
+                    <div className="grid grid-cols-2 gap-2">
+                      <button 
+                        onClick={async () => {
+                          try {
+                            const res = await axios.post('/api/data', {
+                              bots, groups, schedules, templates, logs, isRealDeliveryEnabled
+                            });
+                            if (res.data.ok) {
+                              triggerToast('Production data pushed successfully!', 'success');
+                            }
+                          } catch (e: any) {
+                            const msg = e.response?.data?.message || 'Push failed. Check server logs.';
+                            triggerToast(msg, 'error');
                           }
-                        } catch (e) {
-                          triggerToast('Sync failed. Check console for details.', 'error');
-                        }
-                      }}
-                      className="w-full py-2.5 bg-indigo-600 text-white rounded text-xs font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-                    >
-                      <RefreshCcw size={14} />
-                      Sync to Render Production
-                    </button>
+                        }}
+                        className="py-2.5 bg-indigo-600 text-white rounded text-xs font-bold hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                      >
+                        <RefreshCcw size={14} />
+                        Push to Prod
+                      </button>
+                      <button 
+                        onClick={async () => {
+                          try {
+                            const res = await axios.get('/api/sync-pull');
+                            if (res.data.ok) {
+                              triggerToast('Data pulled from Render successfully!', 'success');
+                              // Reload data from local server
+                              const updatedRes = await fetch("/api/data");
+                              const data = await updatedRes.json();
+                              if (data) {
+                                setBots(data.bots || []);
+                                setGroups(data.groups || []);
+                                setSchedules(data.schedules || []);
+                                setLogs(data.logs || []);
+                                setIsRealDeliveryEnabled(!!data.isRealDeliveryEnabled);
+                              }
+                            }
+                          } catch (e: any) {
+                            const msg = e.response?.data?.message || 'Pull failed. Check server logs.';
+                            triggerToast(msg, 'error');
+                          }
+                        }}
+                        className="py-2.5 bg-slate-800 text-white rounded text-xs font-bold hover:bg-slate-900 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                      >
+                        <Cloud size={14} />
+                        Fetch from Prod
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -2143,7 +2200,7 @@ export default function App() {
                               {schedule.recurrence === 'monthly' && `Day ${schedule.dayOfMonth} @ ${formatTimeTo12Hour(schedule.time)}`}
                               {schedule.recurrence === 'weekly' && `Every ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][schedule.dayOfWeek || 0]} @ ${formatTimeTo12Hour(schedule.time)}`}
                               {schedule.recurrence === 'daily' && `Daily @ ${formatTimeTo12Hour(schedule.time)}`}
-                              {schedule.recurrence === 'once' && `Day ${schedule.dayOfMonth} (Once) @ ${formatTimeTo12Hour(schedule.time)}`}
+                              {schedule.recurrence === 'once' && `On Day ${schedule.dayOfMonth} Once @ ${formatTimeTo12Hour(schedule.time)}`}
                             </div>
 
                             <div className="flex gap-2">
@@ -2200,7 +2257,7 @@ export default function App() {
                           <p className="text-xs text-slate-700 break-words font-mono whitespace-pre-wrap">{schedule.messageTemplate}</p>
                           
                           <div className="mt-3 flex items-center justify-between border-t border-slate-200/60 pt-3">
-                            <span className="text-[10px] text-slate-400">Last Activity: {schedule.lastSent ? new Date(schedule.lastSent).toLocaleString('en-US', { hour12: true }) : 'Never Transmitted'}</span>
+                            <span className="text-[10px] text-slate-400">Server Last Transmit: {formatToBDTime(schedule.lastSent)}</span>
                             <div className="flex gap-2">
                               <span className="text-[10px] text-indigo-500 font-bold bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">{schedule.recurrence.toUpperCase()}</span>
                               {schedule.status === 'active' && <span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>}
@@ -2368,7 +2425,7 @@ export default function App() {
                     logs.map(log => (
                       <div key={log.id} className="border-b border-slate-800/60 pb-3 text-[11px] leading-relaxed relative group">
                         <div className="flex items-center justify-between text-slate-500 mb-1">
-                          <span className="font-bold text-slate-500">TIMESTAMP: {log.timestamp}</span>
+                          <span className="font-bold text-slate-500">TIMESTAMP: {log.timestamp.includes('AM') || log.timestamp.includes('PM') ? log.timestamp : formatToBDTime(log.timestamp)}</span>
                           <span className={`px-2 py-0.5 rounded font-extrabold uppercase text-[9px] ${
                             log.type === 'success' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/40' :
                             log.type === 'error' ? 'bg-rose-950 text-rose-400 border border-rose-800/40' :

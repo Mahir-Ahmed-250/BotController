@@ -118,6 +118,11 @@ const DEFAULT_SYSTEM_DATA = {
   isRealDeliveryEnabled: false
 };
 
+const banglaMonths = [
+  'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+  'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+];
+
 // Helper: Read system data from JSON storage
 function readSystemData() {
   try {
@@ -148,9 +153,15 @@ function getBangladeshNow() {
   // Bangladesh is always UTC+6
   const bdTime = new Date(now.getTime() + (6 * 3600000));
   
+  const hours = bdTime.getUTCHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12;
+  const minutes = String(bdTime.getUTCMinutes()).padStart(2, '0');
+  
   return {
-    hours: String(bdTime.getUTCHours()).padStart(2, '0'),
-    minutes: String(bdTime.getUTCMinutes()).padStart(2, '0'),
+    hours: String(hours).padStart(2, '0'),
+    minutes,
+    displayTime12h: `${displayHours}:${minutes} ${ampm}`,
     dayOfMonth: bdTime.getUTCDate(),
     dayOfWeek: bdTime.getUTCDay(),
     month: bdTime.getUTCMonth(),
@@ -190,11 +201,6 @@ function formatTelegramMessage(
   const toBanglaDigits = (num: string | number): string => {
     return num.toString().replace(/\d/g, (digit) => banglaDigits[parseInt(digit)]);
   };
-
-  const banglaMonths = [
-    'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-    'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
-  ];
 
   const dayOfMonthVal = targetDate.getDate();
   const monthVal = targetDate.getMonth();
@@ -310,7 +316,7 @@ async function runBackgroundSchedulerTicks() {
 
           const newLog: SimulationLog = {
             id: newLogId,
-            timestamp: bdNow.realDate.toISOString(), // Save proper UTC ISO string
+            timestamp: `${bdNow.displayTime12h} (${bdNow.dayOfMonth} ${banglaMonths[bdNow.month]})`,
             type: "info",
             botName: bot.name,
             groupName: group.name,
@@ -376,6 +382,23 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Attempt initial sync from Render on boot
+  const rawRemoteUrl = (process.env.REMOTE_RENDER_URL || "").trim();
+  const remoteUrl = rawRemoteUrl.endsWith('/') ? rawRemoteUrl.slice(0, -1) : rawRemoteUrl;
+  
+  if (remoteUrl && process.env.ENABLE_REMOTE_PUSH === "true") {
+    console.log(`[BOOT] 🔄 Attempting initial pull from ${remoteUrl}...`);
+    try {
+      const response = await axios.get(`${remoteUrl}/api/data`, { timeout: 10000 });
+      if (response.data && response.data.bots) {
+        writeSystemData(response.data);
+        console.log("[BOOT] ✅ Initial sync from Render successful.");
+      }
+    } catch (e: any) {
+      console.warn(`[BOOT] ⚠️ Initial sync skipped: ${e.message}`);
+    }
+  }
+
   // API 1: Fetch state unified across client-reboots
   app.get("/api/data", (req, res) => {
     const data = readSystemData();
@@ -391,25 +414,49 @@ async function startServer() {
       bots: bots || existing.bots,
       groups: groups || existing.groups,
       schedules: schedules || existing.schedules,
-      logs: logs || existing.logs,
+      templates: req.body.templates || existing.templates,
+      logs: (logs || existing.logs).slice(0, 300), // Keep log size manageable
       isRealDeliveryEnabled: typeof isRealDeliveryEnabled === "boolean" ? isRealDeliveryEnabled : existing.isRealDeliveryEnabled
     };
 
     writeSystemData(merged);
 
     // Push to Render if remote URL is set
-    const remoteUrl = process.env.REMOTE_RENDER_URL;
     if (remoteUrl && process.env.ENABLE_REMOTE_PUSH === "true") {
       try {
-        console.log(`[SYNC] Pushing to remote ${remoteUrl}...`);
-        await axios.post(`${remoteUrl}/api/data`, merged, { timeout: 8000 });
-        console.log("[SYNC] Push successful.");
+        console.log(`[SYNC] ⬆️ Pushing updates to ${remoteUrl}...`);
+        await axios.post(`${remoteUrl}/api/data`, merged, { timeout: 10000 });
+        console.log("[SYNC] ✅ Push successful.");
       } catch (err: any) {
-        console.error(`[SYNC] Push failed: ${err.message}`);
+        console.error(`[SYNC] ❌ Push failed: ${err.message}`);
       }
     }
 
     res.json({ ok: true, message: "Storage synced." });
+  });
+
+  // API 3: Force Sync from Remote Render (Pull)
+  app.get("/api/sync-pull", async (req, res) => {
+    if (!remoteUrl) {
+      return res.status(400).json({ 
+        ok: false, 
+        message: "REMOTE_RENDER_URL environment variable is not set in AI Studio Settings." 
+      });
+    }
+
+    try {
+      console.log(`[SYNC] 🔄 Manual pull from ${remoteUrl}...`);
+      const response = await axios.get(`${remoteUrl}/api/data`, { timeout: 12000 });
+      if (response.data && response.data.bots) {
+        writeSystemData(response.data);
+        console.log("[SYNC] ✅ Manual pull successful.");
+        return res.json({ ok: true, message: "Data synchronized from Render production." });
+      }
+      res.status(502).json({ ok: false, message: "Invalid response structure from Render server." });
+    } catch (err: any) {
+      console.error(`[SYNC] ❌ Manual pull failed: ${err.message}`);
+      res.status(502).json({ ok: false, message: `Sync failed: ${err.message}` });
+    }
   });
 
   // Server-side Telegram Message Proxy

@@ -26,7 +26,7 @@
   ],
   "schedules": [
     {
-      "id": "sched_1781721675975exx4",
+      "id": "sched_1781722929160senl",
       "name": "Udvash 1st Slot (Monthly - 14th @ 10:00 AM) (Copy)",
       "botId": "bot_1781696697518",
       "groupId": "grp_1781696704174",
@@ -37,8 +37,8 @@
       "messageTemplate": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি {payment_deadline_bangla} তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment",
       "recurrence": "monthly",
       "dayOfMonth": 18,
-      "time": "00:42",
-      "status": "active",
+      "time": "10:00",
+      "status": "paused",
       "dayOfWeek": 1
     },
     {
@@ -73,6 +73,32 @@
       "time": "10:00",
       "status": "active",
       "dayOfWeek": 1
+    }
+  ],
+  "templates": [
+    {
+      "id": "temp_payment_notice",
+      "title": "Udvash Board Payment Notice",
+      "category": "Alert",
+      "content": "💳পেমেন্ট সংক্রান্ত নোটিশ 💳\nযে সকল পরীক্ষকগণ {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে খাতা মূল্যায়নের পেমেন্ট নিতে আগ্রহী তারা এই ফর্মটি পূরণ করুন, উক্ত ফর্মটি {payment_deadline_bangla} তারিখ রাত ০৮:০০টা পর্যন্ত পূরণ করা যাবে, ফর্ম পূরণকারী ৫০টাকার অধিক ডিউ সম্পন্ন (TIN নম্বর যাদের আছে তাদের ১০০টাকা) পরীক্ষকদের পেমেন্ট {payment_month_bangla} {payment_year_bangla} এর {payment_slot_bangla_locative} মোবাইল ব্যাংকিং এর মাধ্যমে প্রদান করা হবে। একটি টি-পিন এর জন্য একবার এবং সতর্কতার সাথে ফর্মটি পূরণ করার জন্য বিশেষভাবে অনুরোধ করা যাচ্ছে।\n\nবিঃদ্রঃ ফর্ম পূরণ করে মোবাইল ব্যাংকিং এর মাধ্যমে পেমেন্ট এর প্রোসেসিং এর মাঝে আমাদের ক্যাম্পাসে এসে ফিজিক্যালি পেমেন্ট না নেওয়ার জন্য বিশেষ ভাবে অনুরোধ করা যাচ্ছে।\n\nফর্ম লিংকঃ https://tinyurl.com/udvashESMPayment\n\nউদ্ভাসের খাতা মূল্যায়নের পেমেন্ট সম্পর্কে বিস্তারিত জানতেঃ https://tinyurl.com/ESMPayment"
+    },
+    {
+      "id": "temp_01",
+      "title": "Monthly Offer Review",
+      "category": "Promotion",
+      "content": "{greeting_english} Dear members! 🌟\n\nToday's Date: {date} and Time: {time}.\nWe have an exciting discount offer for all {member_count} members of our '{group_name}' group.\n\nInbox us for details. Thank you for staying connected!"
+    },
+    {
+      "id": "temp_02",
+      "title": "Daily Support Reminder",
+      "category": "Support",
+      "content": "{greeting_english} everyone! 🙋‍♂️\n\nToday is {day}.\nOur weekly online mega content session is starting.\n\nTime: {time}\nFeel free to write to the admin if you face any issues."
+    },
+    {
+      "id": "temp_03",
+      "title": "Weekly Promotional Ad",
+      "category": "Greeting",
+      "content": "📢 Ad Alert: {group_name}\n\n{greeting_english}, admission has started for our new batch today, {date}.\nThis message was automatically sent via bot '{bot_name}'.\nFollow the pinned post for regular updates. ❤️"
     }
   ],
   "logs": [
